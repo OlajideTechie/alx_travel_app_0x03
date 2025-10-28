@@ -1,0 +1,20 @@
+# .gitignore
+venv/
+*.pyc
+__pycache__/
+*.sqlite3
+.env
+.DS_Store
+.idea/
+.vscode/
+*.log
+*.pot
+*.py[cod]
+staticfiles/
+media/
+coverage.xml
+htmlcov/
+*.cover
+*.db
+.qodo/
+.DS_Store
