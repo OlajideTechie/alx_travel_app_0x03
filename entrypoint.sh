@@ -1,11 +1,8 @@
 #!/bin/bash
 set -e
 
-# Use Render's PORT or default to 8000
-PORT=${PORT:-8000}
+# Export port for supervisord
+export ENV_PORT=${PORT:-8000}
 
-# Replace placeholder in supervisord.conf
-sed -i "s/%(ENV_PORT)s/$PORT/g" /app/supervisord.conf
-
-# Start Supervisor
+# Start supervisord
 exec supervisord -c /app/supervisord.conf
