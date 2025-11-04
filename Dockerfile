@@ -50,7 +50,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY . .
 
 # Expose port for Render web service
-EXPOSE $PORT
+EXPOSE 8000
 
-# Default command (web service)
-CMD ["gunicorn", "alx_travel_app.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "3"]
+# Use entrypoint script to start both web + celery
+CMD ["/app/entrypoint.sh"]
