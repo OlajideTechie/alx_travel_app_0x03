@@ -3,8 +3,12 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y build-essential libpq-dev curl
+# Install build dependencies for Postgres + Python packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install
 COPY requirements.txt .
@@ -19,7 +23,7 @@ WORKDIR /app
 # Copy installed packages
 COPY --from=builder /install /usr/local
 
-# Copy project
+# Copy project files
 COPY . .
 
 # Create a non-root user
