@@ -52,13 +52,5 @@ COPY . .
 # Expose port for Render web service
 EXPOSE $PORT
 
-# ---------- ENTRYPOINTS ----------
-# For Render, you’ll specify the CMD per service:
-# Web service: Run this in Render's web service CMD
-# CMD ["gunicorn", "alx_travel_app.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "3"]
-
-# Worker service: Run this in Render's worker service CMD
-# CMD ["celery", "-A", "alx_travel_app", "worker", "-l", "info"]
-
-# Optional Flower monitoring (if you want a separate service)
-# CMD ["celery", "-A", "alx_travel_app", "flower", "--port=5555"]
+# Default command (web service)
+CMD ["gunicorn", "alx_travel_app.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "3"]
