@@ -1,59 +1,33 @@
-# ---------- Stage 1: builder ----------
+# Stage 1: Build
 FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+# Install build dependencies
+RUN apt-get update && apt-get install -y build-essential libpq-dev curl
 
-# Install build dependencies for mysqlclient
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    apt-get update --fix-missing && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        pkg-config \
-        default-libmysqlclient-dev \
-        libmariadb3 \
-        libmariadb-dev && \
-    rm -rf /var/lib/apt/lists/*
-
+# Copy requirements and install
 COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --prefix=/install -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir gunicorn celery flower
-
-# ---------- Stage 2: runtime ----------
+# Stage 2: Final image
 FROM python:3.12-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PORT=8000 \
-    PATH="/usr/local/bin:$PATH"
+# Copy installed packages
+COPY --from=builder /install /usr/local
 
-# Install runtime dependencies including supervisor
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get update --fix-missing && \
-    echo "Acquire::Retries \"3\";" > /etc/apt/apt.conf.d/80-retries && \
-    apt-get install -y --no-install-recommends \
-        libmariadb3 \
-        libmariadb-dev \
-        supervisor && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy installed packages and binaries from builder
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy project code
+# Copy project
 COPY . .
 
-# Expose Render web service port
-EXPOSE $PORT
+# Create a non-root user
+RUN useradd -ms /bin/bash appuser
+USER appuser
 
-# Entrypoint script
-CMD ["/app/entrypoint.sh"]
+# Expose port
+EXPOSE 8080
+
+# Start Gunicorn and Celery using supervisord
+CMD ["supervisord", "-c", "/app/supervisord.conf"]
