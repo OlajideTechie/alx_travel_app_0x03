@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn alx_travel_app.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 2 --timeout 60"
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+
+  worker:
+    build: .
+    command: celery -A alx_travel_app worker -l info
+    env_file: .env
+    depends_on:
+      - rabbitmq
+      - db
+
+  flower:
+    image: mher/flower
+    command: flower --broker=amqp://guest:guest@rabbitmq:5672//
+    ports:
+      - "5555:5555"
+    depends_on:
+      - rabbitmq
+
+volumes:
+  pgdata:

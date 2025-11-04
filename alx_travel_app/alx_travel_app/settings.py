@@ -73,9 +73,9 @@ WSGI_APPLICATION = "alx_travel_app.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
+        "NAME": config("POSTGRES_DB"),
+        "USER": config("POSTGRES_USER"),
+        "PASSWORD": config("POSTGRES_PASSWORD"),
         "HOST": config("DB_HOST", default="127.0.0.1"),
         "PORT": config("DB_PORT", default="3306"),
         "OPTIONS": {
@@ -126,7 +126,20 @@ CORS_ALLOWED_ORIGINS = [
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
-    ]
+    ],
+    
+     # Enable throttling
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',   # unauthenticated users
+        'rest_framework.throttling.UserRateThrottle',   # authenticated users
+    ],
+
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '5/minute',   # limit anonymous users
+        'user': '20/minute',  # limit logged-in users
+        'booking': '1/minute',  # custom scope
+        'payment': '1/minute',  # custom scope
+    },
 }
 
 

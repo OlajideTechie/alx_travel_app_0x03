@@ -22,7 +22,7 @@ class Booking(models.Model):
 
 class Review(models.Model):
     review_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    listing = models.ForeignKey(Listing, related_name="bookings", on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, related_name="reviews", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     rating = models.IntegerField()
     comment = models.TextField()
@@ -31,7 +31,7 @@ class Review(models.Model):
     
 class Payments(models.Model):
     payment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    booking = models.ForeignKey('Booking', on_delete=models.CASCADE)
+    booking = models.ForeignKey('Booking', on_delete=models.CASCADE, related_name='payments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(
         max_length=20,
