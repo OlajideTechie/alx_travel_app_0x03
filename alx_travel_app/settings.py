@@ -72,11 +72,11 @@ WSGI_APPLICATION = "alx_travel_app.wsgi.application"
 # --------------------------
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": config("POSTGRES_DB"),
         "USER": config("POSTGRES_USER"),
         "PASSWORD": config("POSTGRES_PASSWORD"),
-        "HOST": config("DB_HOST", default="127.0.0.1"),
+        "HOST": config("DB_HOST"),
         "PORT": config("DB_PORT", default="3306"),
         "OPTIONS": {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -177,8 +177,8 @@ LOGGING = {
 # ----------------------
 # 
 # ----------------------
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis_cache:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis_cache:6379/0")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

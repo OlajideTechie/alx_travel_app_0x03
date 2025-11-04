@@ -53,5 +53,5 @@ whitenoise
 psycopg2-binary>=2.9
 dj-database-url
 celery
-rabbitmq
 django-environ
+redis
