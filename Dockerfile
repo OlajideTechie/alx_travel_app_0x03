@@ -31,7 +31,6 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8000 \
     PATH="/usr/local/bin:$PATH"
 
 # Install runtime dependencies
