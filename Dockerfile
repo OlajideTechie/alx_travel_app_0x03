@@ -38,9 +38,6 @@ RUN mkdir -p /app/staticfiles && \
 RUN useradd -u 1000 -ms /bin/bash appuser
 
 
-# Collect static files as root (or you can switch to appuser temporarily)
-RUN python manage.py collectstatic --noinput
-
 # Switch to non-root user
 USER appuser
 
@@ -53,7 +50,7 @@ ENV DJANGO_SETTINGS_MODULE=alx_travel_app.settings
 ENV STATIC_ROOT=/app/staticfiles
 
 # Collect static files after dependencies are in place
-RUN python manage.py collectstatic --noinput
+# Removed the RUN python manage.py collectstatic --noinput from build stage
 
-# Gunicorn for Django
-CMD ["gunicorn", "alx_travel_app.wsgi:application", "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "2", "--log-level", "info"]
+# Gunicorn for Django with migrations and static collection at runtime
+CMD ["/bin/sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn alx_travel_app.wsgi:application --bind 0.0.0.0:8080 --workers 2 --threads 2 --log-level info"]
