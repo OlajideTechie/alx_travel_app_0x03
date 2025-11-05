@@ -68,20 +68,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "alx_travel_app.wsgi.application"
 
 # --------------------------
-# Database configuration (MySQL)
+# Database configuration (PostgreSQL on Render)
 # --------------------------
+import dj_database_url
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_DB"),
-        "USER": config("POSTGRES_USER"),
-        "PASSWORD": config("POSTGRES_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", default="3306"),
-        "OPTIONS": {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
-    }
+    "default": dj_database_url.config(
+        default=config("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 # --------------------------
